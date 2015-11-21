@@ -2,6 +2,7 @@ package fbloader;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,10 +11,10 @@ import org.json.JSONObject;
 
 import com.restfb.*;
 import com.restfb.types.*;
-
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import java.lang.Thread;
 
 
 /*
@@ -23,19 +24,23 @@ import com.mashape.unirest.http.exceptions.UnirestException;
  * 
  * */
 
-public class FetchPosts {
+
+class AsyncPostFetcher implements Runnable{
 	
+	String accessToken;
+	Integer id;
 	
-	String getStatus()
+	public AsyncPostFetcher(String accessToken ,Integer id )
 	{
-		return "";
+		this.accessToken = accessToken;
+		this.id = id;
 	}
 	
-	static void getPosts(String accessToken) throws Exception
+	static String getPosts(String accessToken) throws Exception
 	{
 		
 		String url  = "https://graph.facebook.com/me/feed?access_token=" + accessToken;
-		url += "&fields=likes.summary(true)%7Bname%7D,message,comments.summary(true)";
+		url += "&fields=status_type,likes.summary(true)%7Bname%7D,message,comments.summary(true)";
 		
 		JSONArray allPosts = new JSONArray();;
 		
@@ -43,9 +48,7 @@ public class FetchPosts {
 		while(!(url.equals("-1")))
 		{
 			String responseJson = Unirest.get(url).asString().getBody();
-			JSONObject posts = new JSONObject(responseJson);
-			
-						
+			JSONObject posts = new JSONObject(responseJson);	
 			
 			for( int i=0; i <  posts.getJSONArray("data").length() ; i++ )
 			{
@@ -60,10 +63,21 @@ public class FetchPosts {
 				} 
 				
 				try {
+					newPost.put("comments" , oldPost.getJSONObject("comments").getJSONObject("summary").getInt("total_count") );
+				} catch (Exception e) { 
+					newPost.put("comments" , -1);
+				} 
+				
+				try {
 					newPost.put("text" ,  oldPost.getString("message") );
 				} catch (Exception e) { 
 					newPost.put("text" , "");
-					System.out.println( posts.getJSONArray("data").getJSONObject(i).toString()   );
+				} 
+				
+				try {
+					newPost.put("type" ,  oldPost.getString("status_type") );
+				} catch (Exception e) { 
+					newPost.put("type" , "-1");
 				} 
 				
 				
@@ -78,37 +92,77 @@ public class FetchPosts {
 				url = "-1";
 			} 
 			
-			
-//			System.out.println(url);
 		}
 		 
-		System.out.println(allPosts.toString());
-		 
+		// now all posts are fetched into allPosts
 		
+		//save in file
 		
-		
-		
-		
-		
+		return (allPosts.toString());
 		
 	}
 	
-	static void GetLikes()
-	{
-		
-	}
 	
-	 public static void main(String[] args) {
-		 
-		 String token = "CAACEdEose0cBAISzPaCLZCXYpbH7db4ak5WuTp8ZCmv2QSMYYoA1OnDrE75zTth7ZBb7vGnjs5bkqZCANzxS4lOCkd0u5z7XmnL2Vx8tjC1lM3QxSaCXTsv4yaJv9aE97uiHMKR7ZAYJEudI18pargkIjACRsXNX3AVxOKPD4p5a1BBE12axRse7a2bIeJZAPVZAcMWJlwSvAZDZD";
-		 try {
-			getPosts(token);
+	
+	public void run() {
+		
+		try {
+			FetchPosts.statuses.put(id, "Started" );
+			FetchPosts.fetchedData.put(id, getPosts( accessToken) );
+			FetchPosts.statuses.put(id, "Done" );
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+}
+
+
+
+
+
+
+public class FetchPosts {
+	
+	
+	
+	public static HashMap<Integer , String> statuses = new HashMap<Integer , String>();
+	public static HashMap<Integer , String> fetchedData = new HashMap<Integer , String>();
+	
+	static Integer nRequests = 0;
+	
+	
+	public static int startDownload(String accessToken)
+	{
+		nRequests++;
+		statuses.put(nRequests, " " );
+		AsyncPostFetcher myposter = new AsyncPostFetcher(accessToken ,  nRequests );
+		Thread t1 = new Thread(myposter);
+	    t1.start();
+		return nRequests;
+	}
+	
+	public static String getStatus(Integer id )
+	{
+		return statuses.get(id);
+	}
+	
+	public static String getData(Integer id )
+	{
+		return fetchedData.get(id);
+	}
+
+
+	
+	 public static void main(String[] args) {
 		 
+		 String token = "CAACEdEose0cBADMxZAleFMRRZAPflIYS3n3nV6FGKZBjssBtK9q9f8kTyCx8ZBrYgdP93jKm8TvdDG3ZCL8Gef9aCuwtZB3LKYWLMAKWWk9ZB1SmxWfn6c9vvZC92HIJNl7J6gfaLCLeQ8SLZAk6R3WaNs8ebZAC8vNOUQvKHVhlo7O5rSJPkM59Fja0yZASG3zXsUqCrHGP02iigZDZD";
 		 
+		 int c = startDownload(token);
+		 
+		 while(!getStatus(c).equals("Done"));
 		 System.out.println("yohoyohoyoho");
+		 System.out.println(getData(c));
 	 }
 }
