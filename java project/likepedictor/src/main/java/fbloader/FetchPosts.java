@@ -1,5 +1,6 @@
 package fbloader;
 
+import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ class AsyncPostFetcher implements Runnable{
 		this.id = id;
 	}
 	
-	static String getPosts(String accessToken) throws Exception
+	String getPosts(String accessToken) throws Exception
 	{
 		
 		String url  = "https://graph.facebook.com/me/feed?access_token=" + accessToken;
@@ -97,6 +98,10 @@ class AsyncPostFetcher implements Runnable{
 		// now all posts are fetched into allPosts
 		
 		//save in file
+		FileWriter out = null;
+		out = new FileWriter("./src/main/java/DataMgr/"+id+".json");
+		out.write(allPosts.toString());
+		out.close();
 		
 		return (allPosts.toString());
 		
@@ -116,6 +121,10 @@ class AsyncPostFetcher implements Runnable{
 		}
 		
 	}
+	
+	
+	
+	
 }
 
 
@@ -157,9 +166,11 @@ public class FetchPosts {
 	
 	 public static void main(String[] args) {
 		 
-		 String token = "CAACEdEose0cBADMxZAleFMRRZAPflIYS3n3nV6FGKZBjssBtK9q9f8kTyCx8ZBrYgdP93jKm8TvdDG3ZCL8Gef9aCuwtZB3LKYWLMAKWWk9ZB1SmxWfn6c9vvZC92HIJNl7J6gfaLCLeQ8SLZAk6R3WaNs8ebZAC8vNOUQvKHVhlo7O5rSJPkM59Fja0yZASG3zXsUqCrHGP02iigZDZD";
+		 String token = "CAACEdEose0cBAE5vYjVQcByFWIFpX3ZBHAcSiAv4aPU3iCFuSg3o2QZBekgHv45r2pxwZBcmCushVGenAr8eZAd8cWsqYyqwER1qvHTV6TNAGoL0yjJXvM6IFcIgH1WWwYfPnNadE90HJRj9yL6PCn8b07Rq9xVyad85lEPvSd0gQNBQPMiBGhV9kFWF0ZCcBXf6pdQVkNwZDZD";
 		 
 		 int c = startDownload(token);
+		// startDownload(token);
+		 //startDownload(token);
 		 
 		 while(!getStatus(c).equals("Done"));
 		 System.out.println("yohoyohoyoho");
