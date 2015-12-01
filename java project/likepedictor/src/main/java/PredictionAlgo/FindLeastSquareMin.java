@@ -1,5 +1,8 @@
+package PredictionAlgo; 
+
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
+
 
 
 public class FindLeastSquareMin 
