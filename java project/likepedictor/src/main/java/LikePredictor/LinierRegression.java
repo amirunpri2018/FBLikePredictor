@@ -97,7 +97,7 @@ public class LinierRegression {
 		 
 		 l.solve();
 		 
-		 Double[] s ={  2.0, 160.0,  23.0  } ;
+		 Double[] s ={  1.0, 160.0,  23.0  } ;
 		 Double ans = l.predict(new  ArrayList<Double>( new ArrayList<Double> (Arrays.asList(s)   )));
 		 
 		 System.out.println(ans);
