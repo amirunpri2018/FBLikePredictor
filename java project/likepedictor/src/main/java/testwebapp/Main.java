@@ -14,10 +14,10 @@ public class Main {
     	port(8081);
     	spark.Spark.staticFileLocation("/public");
     	
-        get("/hello", (req, res) -> ("Hello World" + papa ));
-        get("/ms", (req, res) -> "Hello World or microsoft word ... sam nigga ");
+        get("/predict/:id", (req, res) ->  LikePredictor.LikePredictor.predictLikes(  req.params(":id") ) );
+        get("/fetchposts/:token", (req, res) -> fbloader.FetchPosts.startDownload(req.params(":token"))    );
+        get("/status/:id", (req, res) ->  fbloader.FetchPosts.getStatus( Integer.parseInt( req.params(":id")) ) );
         
-       
         
     }
 }

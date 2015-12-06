@@ -1,114 +1,162 @@
 <html>
-<body>
-<div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '417949931663169', // App ID
-      channelUrl : 'http://localhost:8081/channel.html', // Channel File
-      status     : true, // check login status
-      cookie     : true, // enable cookies to allow the server to access the session
-      xfbml      : true  // parse XFBML
-    });
-    
-    
-	FB.Event.subscribe('auth.authResponseChange', function(response) 
-	{
- 	 if (response.status === 'connected') 
-  	{
-  		document.getElementById("message").innerHTML +=  "<br>Connected to Facebook";
-  		//SUCCESS
-  		
-  	}	 
-	else if (response.status === 'not_authorized') 
-    {
-    	document.getElementById("message").innerHTML +=  "<br>Failed to Connect";
 
-		//FAILED
-    } else 
-    {
-    	document.getElementById("message").innerHTML +=  "<br>Logged Out";
+	<head>
+		<link href="css/bootstrap.css" rel='stylesheet' type='text/css' media="all" />
+		<!-- //bootstrap -->
+		<!-- Custom Theme files -->
+		<link href="css/style.css" rel='stylesheet' type='text/css' media="all" />
+		<script src="js/jquery.min.js"></script>
+		<!--start-smoth-scrolling-->
+		<!--webfonts-->
+			<link href='http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+		<!--webfonts-->	
 
-    	//UNKNOWN ERROR
-    }
-	});	
-	
-    };
-    
-   	function Login()
-	{
-	
-		FB.login(function(response) {
+		  <script src="js/underscore-min.js"></script>
+		  <script src= "js/moment-2.2.1.js"></script>
+		   <script src="js/pagePeeker.js"></script>
+		   <script src="/js/fblogin.js"> </script>
+		    <script src="/js/predict.js"> </script>
+
+	</head>
+
+	<body>
+
+		<nav class="navbar navbar-inverse" style="background-color: #f75d34 ;border-color: #f75d34 ; color:black !important; margin-bottom:-10px;" role="navigation">
+	        <div class="container">
+	            <!-- Brand and toggle get grouped for better mobile display -->
+	            <div class="navbar-header">
+	                <!-- <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+	                    <span class="sr-only">Toggle navigation</span>
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                </button> -->
+	                <!-- <a class="navbar-brand"  style=" color:black" href="#">PanadaSuggest</a> -->
+	            </div>
+	            <!-- Collect the nav links, forms, and other content for toggling -->
+	            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	                <ul class="nav navbar-nav navbar-right">
+	                      <li>
+	                        <a style=" color:white" href="/">Home</a>
+	                    </li>
+
+	                   
+	                    
+	                </ul>
+	            </div>
+	            <!-- /.navbar-collapse -->
+	        </div>
+	        <!-- /.container -->
+	    </nav>	
+
+	    <div id="controlwrapper" style="background-color:rgb(28,44,57)">
+			    <div id="control">
+
+			        <h1>Facebook Like Predictor</h1>
+
+			        <br>
+			        <br>
+
+			        </div>
+			 </div>
+
+		<br><br><br>
+
+	   <div class = "container">
+	   		<div class="col-md-12">
+	   			<div class="bottom-grid-left">
+	   				
+	   				<div id="status">
+	   					<h1 style="">Login with Facebook</h1>
+					 	Click on Below Image to start the demo: <br/>
+						<img src="/LoginWithFacebook.png" style="cursor:pointer;" onclick="Login()"/>
+					</div>
+	   			</div>
+	   		</div>
+	   </div>
+
+	   <br><br>
+
+	    <div class = "container">
+	   		<div class="col-md-12">
+	   			<div class="bottom-grid-left stattss">
+
+	   			</div>
+	   		</div>
+	   </div>
+
+	   <br><br>
 
 
 
-			console.log(response.authResponse);
 
-		   if (response.authResponse) 
-		   {
-		    	getUserInfo();
-  			} else 
-  			{
-  	    	 console.log('User cancelled login or did not fully authorize.');
-   			}
-		 },{scope: 'email,user_photos,user_videos'});
-	
-	
-	}
+	    <div class = "container predictButtBox" , style="display:none">
+	   		<div class="col-md-12">
+	   			<div class="bottom-grid-left">
+	   				
+	   				<div id="status">
+						<div class="col-md-4">
+		                	<button class="large TestButt" tabindex="2" onclick="startFetch()">Predict Likes</button>
+		                	<img src="images/loader.gif" class="lodder" style="display:none">
+		                </div>
+					</div>
+	   			</div>
+	   		</div>
+	   </div>
 
-  function getUserInfo() {
-	    FB.api('/me', function(response) {
+	   <br><br>
 
-	   console.log(response);
 
-	  var str="<b>Name</b> : "+response.name+"<br>";
-	  	  str +="<b>Link: </b>"+response.link+"<br>";
-	  	  str +="<b>Username:</b> "+response.username+"<br>";
-	  	  str +="<b>id: </b>"+response.id+"<br>";
-	  	  str +="<b>Email:</b> "+response.email+"<br>";
-	  	  str +="<input type='button' value='Get Photo' onclick='getPhoto();'/>";
-	  	  str +="<input type='button' value='Logout' onclick='Logout();'/>";
-	  	  document.getElementById("status").innerHTML=str;
-	  	  	    
-    });
-    }
-	function getPhoto()
-	{
-	  FB.api('/me/picture?type=normal', function(response) {
 
-		  var str="<br/><b>Pic</b> : <img src='"+response.data.url+"'/>";
-	  	  document.getElementById("status").innerHTML+=str;
-	  	  	    
-    });
-	
-	}
-	function Logout()
-	{
-		FB.logout(function(){document.location.reload();});
-	}
 
-  // Load the SDK asynchronously
-  (function(d){
-     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement('script'); js.id = id; js.async = true;
-     js.src = "http://connect.facebook.net/en_US/all.js";
-     ref.parentNode.insertBefore(js, ref);
-   }(document));
+	   <div style="display:none">
+	   		<div class="ctt">
+		   		  <div class = "container">
+				   		<div class="col-md-12">
+				   			<div class="bottom-grid-left hhuuhhuu #4">
+				   					<p > #0 </p> <br>
 
-</script>
-<div align="center">
-<h2>Facebook OAuth Javascript Demo</h2>
+				   					<b>Actual Likes : #1 </b> <br>
+				   					<b>Predicted Likes : #2 </b><br>
 
-<div id="status">
- Click on Below Image to start the demo: <br/>
-<img src="http://localhost:8081/LoginWithFacebook.png" style="cursor:pointer;" onclick="Login()"/>
-</div>
-<br/><br/><br/><br/><br/>
-<div id="message">
-Logs:<br/>
-</div>
+				   					<b>Error : #3 </b>
 
-</div>
-</body>
+
+				   				
+				   			</div>
+				   		</div>
+				   		 
+				   </div>
+			   </div>
+	   </div>
+
+	   <div class="allPosts"> 
+
+	   </div>
+	 
+
+
+<!-- 
+		<div id="fb-root"></div>
+		
+
+		</script>
+		<div align="center">
+		<h2>Facebook OAuth Javascript Demo .. pooo</h2>
+
+		<div id="status">
+		 Click on Below Image to start the demo: <br/>
+		<img src="http://localhost:8081/LoginWithFacebook.png" style="cursor:pointer;" onclick="Login()"/>
+		</div>
+		<br/><br/><br/><br/><br/>
+		<div id="message">
+		Logs:<br/>
+		</div>
+ -->
+
+
+
+
+	</div>
+	</body>
 </html>
